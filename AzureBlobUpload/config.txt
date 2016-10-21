@@ -1,0 +1,1 @@
+﻿DefaultEndpointsProtocol=https;AccountName=yourAccount;AccountKey=yourAccountKey
