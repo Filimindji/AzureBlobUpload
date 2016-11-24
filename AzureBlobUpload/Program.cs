@@ -152,7 +152,7 @@ namespace AzureBlobUpload
 
         private static void PrintHelp()
         {
-            Console.WriteLine("-u <container> <file-to-upload> --OPTIONAL <subfolder>");
+            Console.WriteLine("-u <container> <file-to-upload> [subfolder]");
             Console.WriteLine("-d <url> <filename>");
             Console.WriteLine("-r <container> <filename> <new-name>");
         }
