@@ -92,7 +92,7 @@ namespace AzureBlobUpload
         {
             try
             {
-                if (args.Length != 3)
+                if (args.Length < 3)
                 {
                     PrintHelp();
                     return;
@@ -101,6 +101,13 @@ namespace AzureBlobUpload
 
                 string container = args[1];
                 string path = args[2];
+
+                string subdirectory = null;
+
+                if (args.Length == 4)
+                {
+                    subdirectory = args[3];
+                }
 
                 if (File.Exists(path) == false)
                 {
@@ -128,7 +135,7 @@ namespace AzureBlobUpload
                 StorageConfig config = new StorageConfig();
                 StorageHelper storageHelper = new StorageHelper(config);
 
-                Uri result = storageHelper.UploadBlob(container, path, mimeType);
+                Uri result = storageHelper.UploadBlob(container, path, mimeType, subdirectory);
                 Console.WriteLine("");
                 Console.WriteLine("Result : " + result);
 
@@ -145,7 +152,7 @@ namespace AzureBlobUpload
 
         private static void PrintHelp()
         {
-            Console.WriteLine("-u <container> <file-to-upload>");
+            Console.WriteLine("-u <container> <file-to-upload> --OPTIONAL <subfolder>");
             Console.WriteLine("-d <url> <filename>");
             Console.WriteLine("-r <container> <filename> <new-name>");
         }

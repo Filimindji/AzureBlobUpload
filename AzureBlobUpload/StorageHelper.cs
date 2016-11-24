@@ -33,19 +33,37 @@ namespace AzureBlobUpload
 
         private const int MaxBlockSize = 4000000; // Approx. 4MB chunk size
 
-        public Uri UploadBlob(string containerName, string filePath, string contentType)
+        public Uri UploadBlob(string containerName, string filePath, string contentType, string subdirectory)
         {
             byte[] fileContent = File.ReadAllBytes(filePath);
             string blobName = Path.GetFileName(filePath);
-            return UploadBlob(fileContent, containerName, blobName, contentType);
+            return UploadBlob(fileContent, containerName, blobName, contentType, subdirectory);
         }
 
-        private Uri UploadBlob(byte[] fileContent, string containerName, string blobName, string contentType)
+        private Uri UploadBlob(byte[] fileContent, string containerName, string blobName, string contentType, string subdirectory)
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_configuration.ConnexionString);
             CloudBlobClient blobclient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer container = blobclient.GetContainerReference(containerName);
-            CloudBlockBlob blob = container.GetBlockBlobReference(blobName);
+
+            //Get blob reference
+            CloudBlockBlob blob = null;
+            if (!string.IsNullOrEmpty(subdirectory))
+            {
+                subdirectory = subdirectory.Replace('\\', '/');
+                string[] tokenizedDir = subdirectory.Split('/');
+                CloudBlobDirectory dir = container.GetDirectoryReference(tokenizedDir[0]);
+                for (int i = 1; i < tokenizedDir.Length; i++)
+                {
+                    dir = dir.GetDirectoryReference(tokenizedDir[i]);
+                }
+                blob = dir.GetBlockBlobReference(blobName);
+            }
+            else
+            {
+                blob = container.GetBlockBlobReference(blobName);
+            }
+
             HashSet<string> blocklist = new HashSet<string>();
             foreach (FileBlock block in GetFileBlocks(fileContent))
             {
