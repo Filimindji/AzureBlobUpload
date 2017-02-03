@@ -11,6 +11,7 @@ namespace AzureBlobUpload
             if (args.Length < 1)
             {
                 PrintHelp();
+                Console.ReadLine();
                 return;
             }
 
@@ -30,6 +31,7 @@ namespace AzureBlobUpload
 
                 default:
                     PrintHelp();
+                    Console.ReadLine();
                     break;
             }
         }
@@ -98,7 +100,6 @@ namespace AzureBlobUpload
                     return;
                 }
 
-
                 string container = args[1];
                 string path = args[2];
 
@@ -134,6 +135,17 @@ namespace AzureBlobUpload
                 
                 StorageConfig config = new StorageConfig();
                 StorageHelper storageHelper = new StorageHelper(config);
+
+                string blobname = Path.Combine(subdirectory, Path.GetFileName(path));
+                blobname.Replace(@"\", "/");
+
+                if (storageHelper.Exists(container, blobname))
+                {
+                    Console.WriteLine(string.Format("The file {0} already exists in the blob {1} ", blobname, container));
+                    Console.WriteLine("Are you sure you want replace it? (y or n)");
+                    if (Console.Read() == 'n')
+                        return;
+                }
 
                 Uri result = storageHelper.UploadBlob(container, path, mimeType, subdirectory);
                 Console.WriteLine("");
